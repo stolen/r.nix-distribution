@@ -10,12 +10,12 @@ PKG_LONGDESC="Root package used to build and create complete image"
 
 PKG_DEPENDS_TARGET="toolchain squashfs-tools:host dosfstools:host fakeroot:host kmod:host \
                     mtools:host populatefs:host libc gcc linux linux-drivers linux-firmware \
-                    ${BOOTLOADER} busybox umtprd util-linux usb-modeswitch unzip poppler jq socat \
+                    ${BOOTLOADER} busybox umtprd util-linux usb-modeswitch unzip jq socat \
                     p7zip file initramfs grep wget util-linux zstd lz4 empty lzo libzip \
                     bash coreutils modules system-utils autostart quirks powerstate gnupg \
-                    gzip six lynx xmlstarlet vim pyudev dialog dbus-python network rocknix"
+                    gzip six xmlstarlet vim network rocknix"
 
-PKG_UI="emulationstation es-themes textviewer"
+PKG_UI="emulationstation es-themes"
 
 PKG_UI_TOOLS="fileman fbgrab"
 
@@ -23,11 +23,11 @@ PKG_GRAPHICS="imagemagick"
 
 PKG_FONTS="corefonts"
 
-PKG_MULTIMEDIA="ffmpeg vlc mpv gmu"
+PKG_MULTIMEDIA="" # "ffmpeg vlc mpv gmu"
 
 PKG_SOUND="espeak libao"
 
-PKG_SYNC="synctools"
+PKG_SYNC="" # "synctools"
 
 PKG_TOOLS="patchelf git ectool make i2c-tools evtest powertop"
 

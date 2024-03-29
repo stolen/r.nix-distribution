@@ -26,5 +26,5 @@ if build_with_debug && [ "$VALGRIND" = "yes" ]; then
 fi
 
 if listcontains "${GRAPHIC_DRIVERS}" "panfrost"; then
-  PKG_DEPENDS_TARGET="${PKG_DEPENDS_TARGET} nvtop"
+  PKG_DEPENDS_TARGET="${PKG_DEPENDS_TARGET} "
 fi

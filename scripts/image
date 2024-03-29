@@ -204,9 +204,9 @@ then
   # Set mksquashfs options for each compression method
   if [ -z "${SQUASHFS_COMPRESSION_OPTION}" ]; then
     if [ "${SQUASHFS_COMPRESSION:-gzip}" = "gzip" ]; then
-      SQUASHFS_COMPRESSION_OPTION="-Xcompression-level 9 -b 262144"
+      SQUASHFS_COMPRESSION_OPTION="-Xcompression-level 6 -b 262144"
     elif [ "${SQUASHFS_COMPRESSION}" = "lzo" ]; then
-      SQUASHFS_COMPRESSION_OPTION="-Xcompression-level 9 -b 524288"
+      SQUASHFS_COMPRESSION_OPTION="-Xcompression-level 6 -b 524288"
     elif [ "${SQUASHFS_COMPRESSION}" = "zstd" ]; then
       SQUASHFS_COMPRESSION_OPTION="-Xcompression-level 22 -b 262144"
     fi

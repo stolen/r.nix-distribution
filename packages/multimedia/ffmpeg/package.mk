@@ -35,7 +35,7 @@ case ${DEVICE} in
   *)
     case ${PROJECT} in
       Rockchip)
-        PKG_PATCH_DIRS+=" vf-deinterlace-v4l2m2m"
+        PKG_PATCH_DIRS+="" #" vf-deinterlace-v4l2m2m"
       ;;
     esac
   ;;
