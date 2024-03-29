@@ -30,3 +30,10 @@ pre_configure_target(){
   fi
 }
 
+# disable any action to prevent file conflicts with libmali
+# Unfortunately libglvnd cannot reliably wrap ARM's libEGL
+if [ "${OPENGLES}" == "libmali" ]; then
+  PKG_TOOLCHAIN="manual"
+  configure_package() { true; }
+fi
+
