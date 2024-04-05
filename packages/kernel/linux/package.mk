@@ -150,7 +150,6 @@ pre_make_target() {
   # disable lima/panfrost if libmali is configured
   if [ "${OPENGLES}" = "libmali" ]; then
     ${PKG_BUILD}/scripts/config --disable CONFIG_DRM_LIMA
-    ${PKG_BUILD}/scripts/config --disable CONFIG_DRM_PANFROST
   fi
 
   # disable wireguard support if not enabled

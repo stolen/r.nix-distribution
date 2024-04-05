@@ -52,7 +52,7 @@
  
   # Mali GPU family
     MALI_FAMILY="bifrost-g52"
-    GRAPHIC_DRIVERS="panfrost"
+    GRAPHIC_DRIVERS=""
 
   # OpenGL(X) implementation to use (mesa / no)
     OPENGL="mesa"
@@ -74,6 +74,7 @@
 
   # kernel serial console
     EXTRA_CMDLINE="quiet rootwait earlycon=uart8250,mmio32,0xfe660000 console=ttyS2,1500000n8 console=tty1 ssh consoleblank=0 systemd.show_status=0 loglevel=0 panic=20"
+    EXTRA_CMDLINE+=" modprobe.blacklist=panfrost"
 
   # additional packages to install
     ADDITIONAL_PACKAGES=""
@@ -88,6 +89,7 @@
   # Space separated list is supported,
   # e.g. ADDITIONAL_DRIVERS="DRIVER1 DRIVER2"
     ADDITIONAL_DRIVERS="RTL8812AU RTL8814AU RTL8821AU RTL8821CU RTL88x2BU"
+    ADDITIONAL_DRIVERS+=" mali-bifrost"
 
   # Some devices have internal storage.
     INSTALLER_SUPPORT="no"
