@@ -33,6 +33,7 @@ pre_configure_target() {
       PKG_MAKE_OPTS_TARGET=" platform=${DEVICE}"
     ;;
   esac
+  export EGL_LIB=$(pkg-config --libs egl)
 }
 
 makeinstall_target() {
