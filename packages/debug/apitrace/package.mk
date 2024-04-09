@@ -10,4 +10,14 @@ PKG_DEPENDS_TARGET="toolchain"
 PKG_LONGDESC="A set of tools to trace, replay, and inspect OpenGL calls"
 GET_HANDLER_SUPPORT="git"
 
-PKG_CMAKE_OPTS_TARGET="-DENABLE_GUI=false -DENABLE_X11=false"
+PKG_CMAKE_OPTS_TARGET="-DENABLE_GUI=false"
+
+case ${DISPLAYSERVER} in
+  "x11"|"wl")
+    true
+  ;;
+  *)
+    PKG_CMAKE_OPTS_TARGET+=" -DENABLE_X11=false"
+    PKG_PATCH_DIRS="disable_x11"
+  ;;
+esac
