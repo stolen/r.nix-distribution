@@ -1,0 +1,46 @@
+diff -ur wlroots-0.17.2.orig/backend/backend.c wlroots-0.17.2/backend/backend.c
+--- wlroots-0.17.2.orig/backend/backend.c	2024-03-11 20:44:24.000000000 +0300
++++ wlroots-0.17.2/backend/backend.c	2024-04-09 03:43:23.749485953 +0300
+@@ -4,6 +4,7 @@
+ #include <stdlib.h>
+ #include <string.h>
+ #include <unistd.h>
++#include <signal.h>
+ #include <wayland-server-core.h>
+ 
+ #include <wlr/backend/headless.h>
+@@ -293,6 +294,15 @@
+ 
+ struct wlr_backend *wlr_backend_autocreate(struct wl_display *display,
+ 		struct wlr_session **session_ptr) {
++
++	// https://gitlab.freedesktop.org/wlroots/wlroots/-/commit/341b3c8bd2387d9d6fb684e006a4eb45dfe09efa
++	sigset_t mask;
++	wlr_log(WLR_ERROR, "setting sigmask\n");
++	sigemptyset(&mask);
++	sigaddset(&mask, SIGUSR1);
++	pthread_sigmask(SIG_BLOCK, &mask, NULL);
++
++
+ 	if (session_ptr != NULL) {
+ 		*session_ptr = NULL;
+ 	}
+diff -ur wlroots-0.17.2.orig/meson.build wlroots-0.17.2/meson.build
+--- wlroots-0.17.2.orig/meson.build	2024-03-11 20:44:24.000000000 +0300
++++ wlroots-0.17.2/meson.build	2024-04-09 03:40:26.662029335 +0300
+@@ -146,6 +146,7 @@
+ )
+ math = cc.find_library('m')
+ rt = cc.find_library('rt')
++threads = dependency('threads')
+ 
+ wlr_files = []
+ wlr_deps = [
+@@ -153,6 +154,7 @@
+ 	drm,
+ 	xkbcommon,
+ 	pixman,
++    threads,
+ 	math,
+ 	rt,
+ ]
