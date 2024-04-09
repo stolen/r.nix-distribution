@@ -22,7 +22,7 @@ configure_package() {
 
   case ${DISPLAYSERVER} in
     "x11"|"wl")
-      PKG_DEPENDS_TARGET+=" libxcb libXrender libX11 mesa"
+      PKG_DEPENDS_TARGET+=" libxcb libXrender libX11 libXext"
     ;;
   esac
 
