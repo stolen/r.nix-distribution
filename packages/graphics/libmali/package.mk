@@ -31,7 +31,7 @@ esac
 
 PKG_BUILD_FLAGS="-strip"
 PKG_MESON_OPTS_TARGET+=" -Darch=${ARCH} -Dgpu=${MALI_FAMILY} -Dversion=${MALI_VERSION} -Dplatform=${PLATFORM} \
-					     -Dkhr-header=false -Dvendor-package=true -Dwrappers=enabled -Dhooks=true"
+                       -Dkhr-header=false -Dvendor-package=true -Dwrappers=enabled -Dhooks=true"
 
 
 unpack() {
@@ -47,10 +47,20 @@ unpack() {
 }
 
 pre_make_target() {
-  patchelf --rename-dynamic-symbols "${PKG_BUILD}/rename.syms" --add-needed libmali-hook.so.1 libmali-prebuilt.so
+  patchelf --rename-dynamic-symbols "${PKG_BUILD}/rename.syms" libmali-prebuilt.so
 }
 
 post_makeinstall_target() {
   rm -rf "${SYSROOT_PREFIX}/usr/include"   # all needed headers are installed by glvnd, mesa and wayland
   rm -rf "${INSTALL}/etc/ld.so.conf.d" "${SYSROOT_PREFIX}/etc/ld.so.conf.d"
+  mkdir "${INSTALL}/etc/ld.so.conf.d"
+  echo "include /storage/.cache/ld.so.libmali.conf" > "${INSTALL}/etc/ld.so.conf.d/libmali.conf"
+
+  for lib in "${INSTALL}/usr/lib/mali/*.so"; do
+    echo ${lib}
+    patchelf --add-needed libmali-hook.so.1 ${lib}
+  done
+
+  mkdir -p "${INSTALL}/usr/bin/"
+  cp -v "${PKG_BUILD}/bin/gpudriver" "${INSTALL}/usr/bin/"
 }

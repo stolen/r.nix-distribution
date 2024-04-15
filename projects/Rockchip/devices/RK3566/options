@@ -53,13 +53,13 @@
   # Mali GPU family
     MALI_FAMILY="bifrost-g52"
     MALI_VERSION="g13p0"
-    GRAPHIC_DRIVERS=""
+    GRAPHIC_DRIVERS="mali panfrost"
 
   # OpenGL(X) implementation to use (mesa / no)
     OPENGL=""
 
   # OpenGL-ES implementation to use (mesa / no)
-    OPENGLES="libmali"
+    OPENGLES="mesa"
 
   # Displayserver to use (weston / x11 / no)
     DISPLAYSERVER="wl"
@@ -75,10 +75,9 @@
 
   # kernel serial console
     EXTRA_CMDLINE="quiet rootwait earlycon=uart8250,mmio32,0xfe660000 console=ttyS2,1500000n8 console=tty1 ssh consoleblank=0 systemd.show_status=0 loglevel=0 panic=20"
-    EXTRA_CMDLINE+=" modprobe.blacklist=panfrost"
 
   # additional packages to install
-    ADDITIONAL_PACKAGES=""
+    ADDITIONAL_PACKAGES="libmali"
 
   # additional Firmware to use ( )
   # Space separated list is supported,
