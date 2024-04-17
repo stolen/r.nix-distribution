@@ -9,7 +9,9 @@ ui_state() {
   systemctl ${1} ${UI_SERVICE}
 }
 
-if [ "${UI_SERVICE}" = "weston.service" ]
+if command -v foot; then
+  exec foot -F "$@"
+elif [ "${UI_SERVICE}" = "weston.service" ]
 then
   if [ -f "${*}" ]
   then
@@ -17,14 +19,6 @@ then
     weston-terminal --command="${RUN}"
   else
     weston-terminal --command="${*}"
-  fi
-elif echo "${UI_SERVICE}" | grep "sway"; then
-  if [ -f "${*}" ]
-  then
-    RUN=$(echo ${*} | sed 's# #\\ #g')
-    foot -F ${RUN}  
-  else
-    foot -F ${*}
   fi
 else
   ui_state stop
