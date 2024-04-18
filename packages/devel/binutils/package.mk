@@ -71,8 +71,9 @@ make_target() {
   make configure-host
   make -C libiberty
   make -C bfd
+  make -C libctf
   make -C opcodes
-  make -C binutils strings
+  make -C binutils strings readelf
 }
 
 makeinstall_target() {
@@ -82,5 +83,5 @@ makeinstall_target() {
   make DESTDIR="${SYSROOT_PREFIX}" -C opcodes install
 
   mkdir -p ${INSTALL}/usr/bin
-    cp binutils/strings ${INSTALL}/usr/bin
+    cp binutils/{strings,readelf} ${INSTALL}/usr/bin
 }
