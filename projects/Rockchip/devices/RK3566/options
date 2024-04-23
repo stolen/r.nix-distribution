@@ -65,7 +65,7 @@
     DISPLAYSERVER="wl"
 
   # Windowmanager to use (weston / swaywm-env / no)
-    WINDOWMANAGER="weston11"
+    WINDOWMANAGER="swaywm-env"
 
   # Pipewire audio support (yes / no)
     PIPEWIRE_SUPPORT="yes"
