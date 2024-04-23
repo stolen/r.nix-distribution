@@ -1,0 +1,34 @@
+commit 88e91d0724c08bd4250ce606d0dcb6512e7fe81e
+Author: Danil Zagoskin <z@gosk.in>
+Date:   Wed Apr 24 01:22:48 2024 +0300
+
+    do not spam logs about importing buffer
+
+diff --git a/backend/drm/drm.c b/backend/drm/drm.c
+index 6661c221..e9520fe1 100644
+--- a/backend/drm/drm.c
++++ b/backend/drm/drm.c
+@@ -579,8 +579,8 @@ static bool drm_connector_state_update_primary_fb(struct wlr_drm_connector *conn
+ 		&plane->formats);
+ 	wlr_buffer_unlock(local_buf);
+ 	if (!ok) {
+-		wlr_drm_conn_log(conn, WLR_DEBUG,
+-			"Failed to import buffer for scan-out");
++		//wlr_drm_conn_log(conn, WLR_DEBUG,
++		//	"Failed to import buffer for scan-out");
+ 		return false;
+ 	}
+ 
+diff --git a/backend/drm/renderer.c b/backend/drm/renderer.c
+index f98cc869..1c53af88 100644
+--- a/backend/drm/renderer.c
++++ b/backend/drm/renderer.c
+@@ -324,7 +324,7 @@ static struct wlr_drm_fb *drm_fb_create(struct wlr_drm_backend *drm,
+ 		struct wlr_buffer *buf, const struct wlr_drm_format_set *formats) {
+ 	struct wlr_dmabuf_attributes attribs;
+ 	if (!wlr_buffer_get_dmabuf(buf, &attribs)) {
+-		wlr_log(WLR_DEBUG, "Failed to get DMA-BUF from buffer");
++		//wlr_log(WLR_DEBUG, "Failed to get DMA-BUF from buffer");
+ 		return NULL;
+ 	}
+ 
