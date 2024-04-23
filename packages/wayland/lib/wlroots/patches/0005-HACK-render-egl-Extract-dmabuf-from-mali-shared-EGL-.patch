@@ -1,0 +1,71 @@
+commit 7ca52092fa9e5267e1df8508901658cfd4505332
+Author: Jeffy Chen <jeffy.chen@rock-chips.com>
+Date:   Thu Apr 25 10:24:07 2024 +0300
+
+    HACK: render: egl: Extract dmabuf from mali shared EGL wl_buffer
+    
+    For scanning out fullscreen view.
+
+diff --git a/types/wlr_egl_buffer.c b/types/wlr_egl_buffer.c
+index 62e4109c..264f7e4b 100644
+--- a/types/wlr_egl_buffer.c
++++ b/types/wlr_egl_buffer.c
+@@ -17,6 +17,50 @@
+ #include "util/shm.h"
+ 
+ 
++
++static bool egl_buffer_get_dmabuf(struct wlr_buffer *wlr_buffer,
++		struct wlr_dmabuf_attributes *attribs) {
++	struct wlr_egl_buffer *buffer =
++		wl_container_of(wlr_buffer, buffer, base);
++
++	/* HACK: It's a guessed struct for mali_buffer_sharing extension */
++	struct mali_buffer_sharing_info {
++		int fd;
++		int width;
++		int height;
++		int stride;
++		uint32_t fourcc;
++	};
++
++	struct mali_buffer_sharing_info *info =
++		wl_resource_get_user_data(buffer->resource);
++	if (!info) {
++		return false;
++	}
++
++	/* Check it carefully! */
++	struct stat s;
++	if (fstat(info->fd, &s) < 0 ||
++		s.st_size < (wlr_buffer->width * wlr_buffer->height) ||
++		info->width != wlr_buffer->width ||
++		info->height != wlr_buffer->height ||
++		info->stride < wlr_buffer->width) {
++		return false;
++	}
++
++	attribs->width = wlr_buffer->width;
++	attribs->height = wlr_buffer->height;
++	attribs->modifier = DRM_FORMAT_MOD_INVALID;
++	attribs->n_planes = 1;
++	attribs->offset[0] = 0;
++
++	attribs->stride[0] = info->stride;
++	attribs->fd[0] = info->fd;
++	attribs->format = info->fourcc;
++
++	return true;
++}
++
+ static void egl_buffer_destroy(struct wlr_buffer *wlr_buffer) {
+ 	struct wlr_egl_buffer *buffer =
+ 		wl_container_of(wlr_buffer, buffer, base);
+@@ -26,6 +70,7 @@ static void egl_buffer_destroy(struct wlr_buffer *wlr_buffer) {
+ }
+ 
+ static const struct wlr_buffer_impl egl_buffer_impl = {
++	.get_dmabuf = egl_buffer_get_dmabuf,
+ 	.destroy = egl_buffer_destroy,
+ };
+ 

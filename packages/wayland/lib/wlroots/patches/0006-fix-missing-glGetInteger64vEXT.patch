@@ -1,0 +1,32 @@
+commit df8b1f08993b324754d69e94de3ecf6c1eef350b
+Author: Guido Günther <agx@sigxcpu.org>
+Date:   Tue Mar 12 10:38:21 2024 +0100
+
+    gles2: Avoid crash when glGetInteger64vEXT is missing
+    
+    The spec for GL_EXT_disjoint_timer_query says
+    
+    > The GetInteger64vEXT command is required only if OpenGL ES 3.0 or later
+    > is not supported.
+    
+    Some GLES 3.2 implementations like the proprietary mali driver on the
+    rk3566 based OrangePi advertise GL_EXT_disjoint_timer_query but lack
+    glGetInteger64vEXT. Use glGetInteger64v instead.
+
+diff --git a/render/gles2/renderer.c b/render/gles2/renderer.c
+index 1394f65b..2b605232 100644
+--- a/render/gles2/renderer.c
++++ b/render/gles2/renderer.c
+@@ -922,7 +922,11 @@ struct wlr_renderer *wlr_gles2_renderer_create(struct wlr_egl *egl) {
+ 		load_gl_proc(&renderer->procs.glQueryCounterEXT, "glQueryCounterEXT");
+ 		load_gl_proc(&renderer->procs.glGetQueryObjectivEXT, "glGetQueryObjectivEXT");
+ 		load_gl_proc(&renderer->procs.glGetQueryObjectui64vEXT, "glGetQueryObjectui64vEXT");
+-		load_gl_proc(&renderer->procs.glGetInteger64vEXT, "glGetInteger64vEXT");
++		if (eglGetProcAddress("glGetInteger64vEXT")) {
++			load_gl_proc(&renderer->procs.glGetInteger64vEXT, "glGetInteger64vEXT");
++		} else {
++			load_gl_proc(&renderer->procs.glGetInteger64vEXT, "glGetInteger64v");
++		}
+ 	}
+ 
+ 	if (renderer->exts.KHR_debug) {
