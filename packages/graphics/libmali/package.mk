@@ -57,7 +57,7 @@ post_makeinstall_target() {
   mkdir "${INSTALL}/etc/ld.so.conf.d"
   echo "include /storage/.cache/ld.so.libmali.conf" > "${INSTALL}/etc/ld.so.conf.d/__priority__libmali.conf"
 
-  for lib in "${INSTALL}/usr/lib/mali/*.so"; do
+  for lib in "${INSTALL}/usr/lib*/mali/*.so"; do
     echo ${lib}
     patchelf --add-needed libmali-hook.so.1 ${lib}
   done
