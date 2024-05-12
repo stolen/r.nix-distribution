@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: GPL-2.0
 /*
- * Elida kd35t133 5.5" MIPI-DSI panel driver
- * Copyright (C) 2020 Theobroma Systems Design und Consulting GmbH
+ * Generic MIPI-DSI panel driver
+ * Copyright (C) 2024 ROCKNIX
  *
  * based on
  *
@@ -24,18 +24,9 @@
 #include <drm/drm_modes.h>
 #include <drm/drm_panel.h>
 
-/* Manufacturer specific Commands send via DSI */
-#define KD35T133_CMD_INTERFACEMODECTRL		0xb0
-#define KD35T133_CMD_FRAMERATECTRL		0xb1
-#define KD35T133_CMD_DISPLAYINVERSIONCTRL	0xb4
-#define KD35T133_CMD_DISPLAYFUNCTIONCTRL	0xb6
-#define KD35T133_CMD_POWERCONTROL1		0xc0
-#define KD35T133_CMD_POWERCONTROL2		0xc1
-#define KD35T133_CMD_VCOMCONTROL		0xc5
-#define KD35T133_CMD_POSITIVEGAMMA		0xe0
-#define KD35T133_CMD_NEGATIVEGAMMA		0xe1
-#define KD35T133_CMD_SETIMAGEFUNCTION		0xe9
-#define KD35T133_CMD_ADJUSTCONTROL3		0xf7
+static char *descfile = "mipi-generic.desc";
+module_param(descfile,charp,0660);
+MODULE_PARM_DESC(descfile, "Panel description filename in firmware dir");
 
 struct generic_panel_delays {
     int prepare;
@@ -249,7 +240,7 @@ int load_panel_description(struct mipi_dsi_device *dsi, struct generic_panel *ct
     const struct firmware *fw;
     int ret;
 
-	ret = request_firmware(&fw, "testpanel.desc", dev);
+	ret = request_firmware(&fw, descfile, dev);
 	if (ret) {
 		dev_err(dev, "No config file found (error=%d)\n", ret);
 		return -1;
@@ -582,7 +573,7 @@ static void generic_panel_remove(struct mipi_dsi_device *dsi)
 }
 
 static const struct of_device_id generic_panel_of_match[] = {
-	{ .compatible = "rocknix,testpanel" },
+	{ .compatible = "rocknix,generic-dsi" },
 	{ /* sentinel */ }
 };
 MODULE_DEVICE_TABLE(of, generic_panel_of_match);
