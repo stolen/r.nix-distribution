@@ -24,7 +24,7 @@
 #include <drm/drm_modes.h>
 #include <drm/drm_panel.h>
 
-static char *descfile = "mipi-generic.desc";
+static char *descfile = "";
 module_param(descfile,charp,0660);
 MODULE_PARM_DESC(descfile, "Panel description filename in firmware dir");
 
@@ -75,7 +75,7 @@ struct generic_panel {
 
 
 int load_panel_description(struct mipi_dsi_device *dsi, struct generic_panel *ctx);
-int load_panel_description_line(char *data, size_t len, struct mipi_dsi_device *dsi, struct generic_panel *ctx);
+int load_panel_description_line(char *data, struct mipi_dsi_device *dsi, struct generic_panel *ctx);
 int load_globals(char *data, struct mipi_dsi_device *dsi, struct generic_panel *ctx);
 int load_mode(char *data, struct mipi_dsi_device *dsi, struct generic_panel *ctx);
 int load_init_seq(char *data, struct mipi_dsi_device *dsi, struct generic_panel *ctx);
@@ -208,7 +208,7 @@ int load_init_seq(char *data, struct mipi_dsi_device *dsi, struct generic_panel 
 /*
  * data   is a null-terminated string of panel description
  */
-int load_panel_description_line(char *data, size_t len, struct mipi_dsi_device *dsi, struct generic_panel *ctx) {
+int load_panel_description_line(char *data, struct mipi_dsi_device *dsi, struct generic_panel *ctx) {
     size_t pos;
     for (pos = 0; data[pos] != 0; pos ++) {
         if (data[pos] == '#') {
@@ -240,29 +240,62 @@ int load_panel_description(struct mipi_dsi_device *dsi, struct generic_panel *ct
     const struct firmware *fw;
     int ret;
 
-	ret = request_firmware(&fw, descfile, dev);
-	if (ret) {
-		dev_err(dev, "No config file found (error=%d)\n", ret);
-		return -1;
-	}
+    if (strlen(descfile) > 0) {
+        ret = request_firmware(&fw, descfile, dev);
+        if (ret) {
+            dev_err(dev, "No config file found (error=%d)\n", ret);
+            return -1;
+        }
 
-    size_t pos = 0, size = fw->size;
-    char *data = (char *)fw->data;
+        size_t pos = 0, size = fw->size;
+        char *data = (char *)fw->data;
 
-    while (pos < size) {
-        while ((pos < size) && (data[pos] != '\n')) pos++;
+        while (pos < size) {
+            while ((pos < size) && (data[pos] != '\n')) pos++;
 
-        if (pos < size) pos++;
-        data[pos - 1] = 0;
+            if (pos < size) pos++;
+            data[pos - 1] = 0;
 
-        load_panel_description_line(data, pos-1, dsi, ctx);
+            load_panel_description_line(data, dsi, ctx);
 
-        data = &data[pos];
-        size = size - pos;
-        pos = 0;
+            data = &data[pos];
+            size = size - pos;
+            pos = 0;
+        }
+
+        release_firmware(fw);
+    } else {
+        //ret = of_drm_get_panel_orientation(dev->of_node, &ctx->orientation);
+        const char **lines = NULL;
+        size_t linescnt, i;
+
+        linescnt = of_property_count_strings(dev->of_node, "panel_description");
+        if (linescnt < 1) {
+            dev_err(dev, "failed to read panel_description from device tree %ld\n", linescnt);
+            return -1;
+        }
+
+        lines = devm_kcalloc(dev, linescnt + 1, sizeof(*lines), GFP_KERNEL);
+        if (!lines) {
+            dev_err(dev, "failed to allocate description lines\n");
+            return -1;
+        }
+
+        linescnt = of_property_read_string_array(dev->of_node, "panel_description", lines, linescnt);
+        if (linescnt < 0) {
+            dev_err(dev, "failed to read panel_description from device tree %ld\n", linescnt);
+            return -1;
+        }
+
+        size_t buflen = 0;
+        for (i = 0; i < linescnt; i++) { buflen = max(buflen, strlen(lines[i])+1); };
+        char *buf = devm_kcalloc(dev, buflen, sizeof(char), GFP_KERNEL);
+        for (i = 0; i < linescnt; i++) {
+            dev_info(dev, "desc: %s", lines[i]);
+            strncpy(buf, lines[i], buflen);
+            load_panel_description_line(buf, dsi, ctx);
+        }
     }
-
-	release_firmware(fw);
 
     // Reverse iseq
     struct generic_panel_init_seq *rev = ctx->iseq, *fwd = NULL, *tmp = NULL;
@@ -520,7 +553,12 @@ static int generic_panel_probe(struct mipi_dsi_device *dsi)
 			  MIPI_DSI_MODE_LPM | MIPI_DSI_MODE_NO_EOT_PACKET |
 			  MIPI_DSI_CLOCK_NON_CONTINUOUS;
 
-    load_panel_description(dsi, ctx);
+    ret = load_panel_description(dsi, ctx);
+    if (ret < 0) {
+		dev_err(dev, "Failed to load panel description\n");
+		return ret;
+    }
+
 	mipi_dsi_set_drvdata(dsi, ctx);
 
     dev_info(dev, "lanes %d, format %d, mode %lx\n", dsi->lanes, dsi->format, dsi->mode_flags);
@@ -580,7 +618,7 @@ MODULE_DEVICE_TABLE(of, generic_panel_of_match);
 
 static struct mipi_dsi_driver generic_panel_driver = {
 	.driver = {
-		.name = "Rocknix generic panel",
+		.name = "panel-generic-dsi",
 		.of_match_table = generic_panel_of_match,
 	},
 	.probe	= generic_panel_probe,

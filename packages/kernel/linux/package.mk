@@ -19,7 +19,7 @@ if [ "${DEVICE}" = "S922X" -a "${USE_MALI}" = "no" ]; then
 fi
 
 case ${DEVICE} in
-  RK3326)
+  noRK3326)
     PKG_VERSION="6.8.9"
     PKG_URL="https://git.kernel.org/torvalds/t/linux-${PKG_VERSION}.tar.gz"
     PKG_PATCH_DIRS+=" mainline"
@@ -77,6 +77,10 @@ post_unpack() {
        $(get_build_dir rocknix-joypad)/rocknix-singleadc-joypad.c \
        ${PKG_BUILD}/drivers/input/joystick
     echo "obj-y += rocknix-joypad.o rocknix-singleadc-joypad.o" >> ${PKG_BUILD}/drivers/input/joystick/Makefile
+  fi
+  if [ "${DEVICE}" = "RK3326" ]; then
+    cp -v $(get_pkg_directory generic-dsi)/sources/panel-generic-dsi.c ${PKG_BUILD}/drivers/gpu/drm/panel/
+	echo "obj-y" += panel-generic-dsi.o >> ${PKG_BUILD}/drivers/gpu/drm/panel/Makefile
   fi
 }
 
