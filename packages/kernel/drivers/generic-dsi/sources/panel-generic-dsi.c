@@ -33,7 +33,7 @@ struct generic_panel_delays {
     int reset;
     int init;
     int enable;
-    int disable;
+    int ready;
     int unprepare;
 };
 
@@ -94,7 +94,7 @@ int load_globals(char *data, struct mipi_dsi_device *dsi, struct generic_panel *
             ctx->delays.reset       = delays[2];
             ctx->delays.init        = delays[3];
             ctx->delays.enable      = delays[4];
-            ctx->delays.disable     = delays[5];
+            ctx->delays.ready       = delays[5];
             ctx->delays.unprepare   = delays[6];
         } else if (strcmp(param, "size") == 0) {
             int size[] = {0, -1, -1};
@@ -388,13 +388,13 @@ static int generic_panel_prepare(struct drm_panel *panel)
 		goto disable_vdd;
 	}
 
-	msleep(20);
+	msleep(ctx->delays.prepare);
 
 	gpiod_set_value_cansleep(ctx->reset_gpio, 1);
-	usleep_range(10, 20);
+	msleep(ctx->delays.reset);
 	gpiod_set_value_cansleep(ctx->reset_gpio, 0);
 
-	msleep(20);
+	msleep(ctx->delays.init);
 
 	ret = mipi_dsi_dcs_exit_sleep_mode(dsi);
 	if (ret < 0) {
@@ -402,7 +402,7 @@ static int generic_panel_prepare(struct drm_panel *panel)
 		goto disable_iovcc;
 	}
 
-	msleep(250);
+	msleep(ctx->delays.enable);
 
 	ret = generic_panel_init_sequence(ctx);
 	if (ret < 0) {
@@ -416,7 +416,7 @@ static int generic_panel_prepare(struct drm_panel *panel)
 		goto disable_iovcc;
 	}
 
-	msleep(50);
+	msleep(ctx->delays.ready);
 
 	ctx->prepared = true;
 
