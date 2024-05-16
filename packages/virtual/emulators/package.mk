@@ -17,10 +17,10 @@ LIBRETRO_CORES="81-lr a5200-lr arduous-lr atari800-lr beetle-gba-lr beetle-lynx-
                 bluemsx-lr cap32-lr crocods-lr daphne-lr dosbox-svn-lr dosbox-pure-lr duckstation-lr duckstation-sa easyrpg-lr        \
                 emuscv-lr fake08-lr fbalpha2012-lr fbalpha2019-lr fbneo-lr fceumm-lr flycast2021-lr fmsx-lr freechaf-lr freeintv-lr   \
                 freej2me-lr fuse-lr gambatte-lr gearboy-lr gearcoleco-lr gearsystem-lr genesis-plus-gx-lr genesis-plus-gx-wide-lr     \
-                gw-lr handy-lr hatari-lr idtech-lr jaxe-lr mame-lr mame2003-plus-lr mame2010-lr mame2015-lr melonds-lr mesen-lr       \
+                gw-lr handy-lr hatari-lr idtech-lr jaxe-lr melonds-lr mesen-lr       \
                 mgba-lr minivmac-lr  mojozork-lr mu-lr mupen64plus-lr mupen64plus-nx-lr neocd_lr nestopia-lr np2kai-lr o2em-lr        \
                 opera-lr parallel-n64-lr pcsx_rearmed-lr picodrive-lr pokemini-lr potator-lr prosystem-lr puae-lr puae2021-lr         \
-                px68k-lr quasi88-lr quicknes-lr race-lr same_cdi-lr sameboy-lr sameduck-lr scummvm-lr smsplus-gx-lr snes9x-lr         \
+                px68k-lr quasi88-lr quicknes-lr race-lr same_cdi-lr sameboy-lr sameduck-lr smsplus-gx-lr snes9x-lr         \
                 snes9x2002-lr snes9x2005_plus-lr snes9x2010-lr stella-lr swanstation-lr tgbdual-lr theodore-lr tic80-lr uzem-lr       \
                 vba-next-lr vbam-lr vecx-lr vice-lr vircon32-lr virtualjaguar-lr xmil-lr yabasanshiro-lr"
 
@@ -62,7 +62,7 @@ case "${DEVICE}" in
   RK3326*)
     [ "${ENABLE_32BIT}" == "true" ] && EMUS_32BIT="box86 desmume-lr gpsp-lr pcsx_rearmed-lr"
     PKG_DEPENDS_TARGET+=" common-shaders glsl-shaders"
-    PKG_EMUS+=" box64 drastic-sa mednafen portmaster scummvmsa yabasanshiro-sa"
+    PKG_EMUS+=" box64 drastic-sa mednafen portmaster yabasanshiro-sa"
     LIBRETRO_CORES+=" flycast-lr flycast2021-lr geolith-lr uae4arm"
     PKG_RETROARCH+=" retropie-shaders"
   ;;
@@ -169,13 +169,9 @@ makeinstall_target() {
   add_es_system amstradcpc
 
   ### Arcade
-  add_emu_core arcade retroarch mame2003_plus true
-  add_emu_core arcade retroarch mame2010 false
-  add_emu_core arcade retroarch mame2015 false
   add_emu_core arcade retroarch fbneo false
   add_emu_core arcade retroarch fbalpha2012 false
   add_emu_core arcade retroarch fbalpha2019 false
-  add_emu_core arcade retroarch mame false
   add_es_system arcade
 
   ### Arduboy
@@ -269,8 +265,6 @@ makeinstall_target() {
 
   ### Capcom Playsystem 1
   add_emu_core cps1 retroarch fbneo true
-  add_emu_core cps1 retroarch mame2003_plus false
-  add_emu_core cps1 retroarch mame2010 false
   add_emu_core cps1 retroarch fbalpha2012 false
   case ${TARGET_ARCH} in
     aarch64)
@@ -281,8 +275,6 @@ makeinstall_target() {
 
   ### Capcom Playsystem 2
   add_emu_core cps2 retroarch fbneo true
-  add_emu_core cps2 retroarch mame2003_plus false
-  add_emu_core cps2 retroarch mame2010 false
   add_emu_core cps2 retroarch fbalpha2012 false
   case ${TARGET_ARCH} in
     aarch64)
@@ -293,8 +285,6 @@ makeinstall_target() {
 
   ### Capcom Playsystem 3
   add_emu_core cps3 retroarch fbneo true
-  add_emu_core cps3 retroarch mame2003_plus false
-  add_emu_core cps3 retroarch mame2010 false
   add_emu_core cps3 retroarch fbalpha2012 false
   case ${TARGET_ARCH} in
     aarch64)
@@ -367,10 +357,6 @@ makeinstall_target() {
 
   ### Final Burn Neo
   add_emu_core fbn retroarch fbneo true
-  add_emu_core fbn retroarch mame2003_plus false
-  add_emu_core fbn retroarch mame2010 false
-  add_emu_core fbn retroarch mame2015 false
-  add_emu_core fbn retroarch mame false
   add_emu_core fbn retroarch fbalpha2012 false
   add_emu_core fbn retroarch fbalpha2019 false
   add_es_system fbn
@@ -386,7 +372,6 @@ makeinstall_target() {
 
   ### Nintendo Game and Watch
   add_emu_core gameandwatch retroarch gw
-  add_emu_core gameandwatch retroarch mame
   add_es_system gameandwatch
 
   ### Nintendo GameBoy
@@ -571,10 +556,6 @@ makeinstall_target() {
   add_es_system zmachine
 
   ### Arcade (MAME)
-  add_emu_core mame retroarch mame2003_plus true
-  add_emu_core mame retroarch mame2010 false
-  add_emu_core mame retroarch mame2015 false
-  add_emu_core mame retroarch mame false
   add_emu_core mame retroarch fbneo false
   add_emu_core mame retroarch fbalpha2012 false
   add_emu_core mame retroarch fbalpha2019 false
@@ -655,12 +636,8 @@ makeinstall_target() {
 
   ### SNK NeoGeo
   add_emu_core neogeo retroarch fbneo true
-  add_emu_core neogeo retroarch mame2003_plus false
   add_emu_core neogeo retroarch fbalpha2012 false
   add_emu_core neogeo retroarch fbalpha2019 false
-  add_emu_core neogeo retroarch mame2010 false
-  add_emu_core neogeo retroarch mame2015 false
-  add_emu_core neogeo retroarch mame false
   case ${TARGET_ARCH} in
     aarch64)
       add_emu_core neogeo retroarch geolith false
@@ -895,18 +872,6 @@ makeinstall_target() {
   add_emu_core pokemini retroarch pokemini true
   add_es_system pokemini
 
-  ### ScummVM
-  case ${DEVICE} in
-    S922X)
-      add_emu_core scummvm retroarch scummvm true
-    ;;
-    *)
-      add_emu_core scummvm scummvmsa scummvm true
-      add_emu_core scummvm retroarch scummvm false
-    ;;
-  esac
-  add_es_system scummvm
-  install_script "Start ScummVM.sh"
 
   ### Joseph Weisbecker CHIP-8
   add_emu_core chip-8 retroarch jaxe true
