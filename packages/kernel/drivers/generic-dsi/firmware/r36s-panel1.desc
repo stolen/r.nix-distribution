@@ -1,8 +1,16 @@
-G size=52,70 delays=20,150,20,120,20 format=rgb888 lanes=4 flags=0xe03
+G name='R36s New Panel 1' size=52,70 delays=20,150,20,120,20 format=rgb888 lanes=4 flags=0xe03
 
-M clock=29000 horizontal=640,80,20,80 vertical=480,20,4,12  default=1
-M clock=29000 horizontal=640,80,20,80 vertical=480,20,4,12
-M clock=29000 horizontal=640,80,20,80 vertical=480,20,4,12
+M clock=29000 horizontal=640,80,323,80 vertical=480,20,5,12 # fps=49.949104 (target=49.950050)
+M clock=29000 horizontal=640,80,309,80 vertical=480,20,11,12 # fps=49.999397 (target=50.000000)
+M clock=29000 horizontal=640,80,268,80 vertical=480,20,31,12 # fps=50.006553 (target=50.007000)
+M clock=29000 horizontal=640,80,117,80 vertical=480,20,38,12 # fps=57.499752 (target=57.500000)
+M clock=29000 horizontal=640,80,78,80 vertical=480,20,41,12 # fps=59.728052 (target=59.727500)
+M clock=29000 horizontal=640,80,91,80 vertical=480,20,31,12 # fps=59.940514 (target=59.940060)
+M clock=29000 horizontal=640,80,82,80 vertical=480,20,36,12 default=1 # fps=59.999669 (target=60.000000)
+M clock=29000 horizontal=640,80,71,80 vertical=480,20,42,12 # fps=60.099392 (target=60.098800)
+M clock=32000 horizontal=640,80,20,80 vertical=480,20,5,12 # (CAN FAIL) fps=75.482380 (target=75.470000)
+M clock=39000 horizontal=640,80,27,80 vertical=480,20,12,12 # (CAN FAIL) fps=89.996954 (target=90.000000)
+M clock=51000 horizontal=640,80,22,80 vertical=480,20,5,12 # (CAN FAIL) fps=120.007342 (target=120.000000)
 
 I seq=e0abba # orig_cmd=0x39
 I seq=e1baab # orig_cmd=0x39

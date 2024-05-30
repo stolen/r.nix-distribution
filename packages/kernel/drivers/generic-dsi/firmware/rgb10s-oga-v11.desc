@@ -1,0 +1,30 @@
+G name='RGB10s odroidgo2-v11' size=42,82 delays=2,1,20,120,20 format=rgb888 lanes=1 flags=0xe03
+
+M clock=17000 horizontal=320,130,72,130 vertical=480,2,38,2 # fps=49.949463 (target=49.950050)
+M clock=17000 horizontal=320,130,100,130 vertical=480,2,16,2 # fps=50.000000 (target=50.000000)
+M clock=17000 horizontal=320,130,70,130 vertical=480,2,39,2 # fps=50.007354 (target=50.007000)
+M clock=17000 horizontal=320,130,9,130 vertical=480,2,18,2 # fps=57.494978 (target=57.500000)
+M clock=17000 horizontal=320,130,7,130 vertical=480,2,1,2 # fps=59.713026 (target=59.727500)
+M clock=17000 horizontal=320,130,5,130 vertical=480,2,1,2 # fps=59.917173 (target=59.940060)
+M clock=17000 horizontal=320,130,4,130 vertical=480,2,1,2 default=1 # fps=60.019771 (target=60.000000)
+M clock=18000 horizontal=320,130,35,130 vertical=480,2,3,2 # (CAN FAIL) fps=60.099164 (target=60.098800)
+M clock=22000 horizontal=320,130,21,130 vertical=480,2,1,2 # (CAN FAIL) fps=75.475582 (target=75.470000)
+M clock=26000 horizontal=320,130,12,130 vertical=480,2,4,2 # (CAN FAIL) fps=89.997785 (target=90.000000)
+M clock=34000 horizontal=320,130,4,130 vertical=480,2,1,2 # (CAN FAIL) fps=120.039542 (target=120.000000)
+
+I seq=11 wait=250 # orig_cmd=0x5
+I seq=e0001318040f063a564d030a06303e0f # orig_cmd=0x39
+I seq=e100131801110638344d060d0b31370f # orig_cmd=0x39
+I seq=c01817 # orig_cmd=0x15
+I seq=c141 # orig_cmd=0x15
+I seq=c5001a80 # orig_cmd=0x39
+I seq=3648 # orig_cmd=0x15
+I seq=3a55 # orig_cmd=0x15
+I seq=b000 # orig_cmd=0x15
+I seq=b1a0 # orig_cmd=0x15
+I seq=b402 # orig_cmd=0x15
+I seq=b62002 # orig_cmd=0x15
+I seq=e900 # orig_cmd=0x15
+I seq=f7a9512c82 # orig_cmd=0x39
+I seq=21 # orig_cmd=0x5
+I seq=29 wait=50 # orig_cmd=0x5

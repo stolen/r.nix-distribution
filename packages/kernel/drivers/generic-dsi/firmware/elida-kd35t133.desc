@@ -1,3 +1,4 @@
+# This description was hand-crafted and repeats the panel-elida-kd35t133 rocknix driver
 # size=width_mm,height_mm delays=prepare,reset,init,enable,disable,unprepare
 G size=42,82 delays=2,1,20,120,50,20 format=rgb888 lanes=1 flags=0xe03   # DSI params
 
