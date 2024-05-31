@@ -53,6 +53,7 @@ struct generic_panel_mode {
 struct generic_panel_init_seq {
     int dcs;
     int len;
+    int read;
     int wait;
     u8 *data;
     struct generic_panel_init_seq *link;
@@ -175,6 +176,7 @@ int load_init_seq(char *data, struct mipi_dsi_device *dsi, struct generic_panel 
 	item = devm_kzalloc(dev, sizeof(*item), GFP_KERNEL);
     item->dcs = -1;
     item->len = -1;
+    item->read = 0;
     item->wait = 0;
 
     while (*data) {
@@ -200,6 +202,8 @@ int load_init_seq(char *data, struct mipi_dsi_device *dsi, struct generic_panel 
                 dev_info(dev, "bad seq %s\n", val);
                 return -1;
             }
+        } else if (strcmp(param, "read") == 0) {
+            item->read = simple_strtoul(val, NULL, 16);
         } else if (strcmp(param, "wait") == 0) {
             item->wait = simple_strtoul(val, NULL, 16);
         } else {
@@ -309,7 +313,7 @@ int load_panel_description(struct mipi_dsi_device *dsi, struct generic_panel *ct
         }
 
         for (i = 0; i < linescnt; i++) {
-            dev_info(dev, "desc: %s", lines[i]);
+            dev_dbg(dev, "desc: %s", lines[i]);
             strncpy(buf, lines[i], buflen);
             load_panel_description_line(buf, dsi, ctx);
         }
@@ -345,9 +349,20 @@ static int generic_panel_init_sequence(struct generic_panel *ctx)
 
     struct generic_panel_init_seq *iseq = ctx->iseq;
     while (iseq) {
-        if (iseq->dcs == DCS_PSEUDO_CMD_SEQ) {
+        if (iseq->read > 0) {
+            u8 readbuf[8];
+            if (iseq->read > 8) { iseq->read = 8; }
+            ret = mipi_dsi_generic_read(dsi, iseq->data, iseq->len, &readbuf[0], iseq->read);
+            if (ret < 0) {
+                dev_err(ctx->dev, "failed to read: %d\n", ret);
+            } else {
+                for (int i = 0; i < ret; i++) {
+                    dev_info(ctx->dev, "read[%d]: %02x\n", i, readbuf[i]);
+                }
+            }
+        } else if (iseq->dcs == DCS_PSEUDO_CMD_SEQ) {
             ret = mipi_dsi_dcs_write_buffer(dsi, iseq->data, iseq->len);
-            dev_dbg(dev, "iseq %02x len=%d -> %d\n", iseq->dcs, iseq->len, ret);
+            dev_dbg(dev, "iseq len=%d -> %d\n", iseq->len, ret);
         } else {
             ret = mipi_dsi_dcs_write(dsi, iseq->dcs, iseq->data, iseq->len);
             dev_dbg(dev, "iseq %02x len=%d -> %d\n", iseq->dcs, iseq->len, ret);
