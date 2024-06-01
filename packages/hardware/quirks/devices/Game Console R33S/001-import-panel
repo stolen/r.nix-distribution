@@ -1,0 +1,37 @@
+#!/bin/bash
+
+IMPORTSCRIPT="/usr/libexec/generic-dsi/importpanel.py"
+
+SRCDTB="/flash/rk3326-r35s-linux.dtb"
+DSTDTBO="/flash/overlays/mipi-panel.dtbo"
+TMPDTBO="/tmp/mipi-panel.dtbo"
+
+# no-op if there is no source dtb
+[ -f ${SRCDTB} ] || exit 0
+
+CKSUM=$(cat /etc/os-release /flash/rk3326-r35s-linux.dtb | md5sum | cut -d" " -f1)
+
+if [ -f "${DSTDTBO}.cksum" ]; then
+  STOREDCKSUM=$(cat ${DSTDTBO}.cksum)
+else
+  STOREDCKSUM="-"
+fi
+
+# If checksum matches, do nothing
+[ "${STOREDCKSUM}" != "${CKSUM}" ] || exit 0
+
+echo "Importing panel description..."
+
+. /etc/profile
+
+${IMPORTSCRIPT} ${SRCDTB} -O ${TMPDTBO}
+
+# Here we have the imported description ad .dtbo file, time to save everything to /flash
+mount -o remount,rw /flash
+mkdir -p $(dirname ${DSTDTBO})
+cp ${TMPDTBO} ${DSTDTBO}
+echo ${CKSUM} > "${DSTDTBO}.cksum"
+
+# As we have a stock dtb for r35/r36, we can swich the device for sure,
+# also device-switch performs some cleanup and reboots the device
+/usr/bin/device-switch R36S

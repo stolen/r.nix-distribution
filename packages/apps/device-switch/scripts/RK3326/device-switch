@@ -21,4 +21,5 @@ $1
 EOF
 
 sync
+mount -o remount,ro /flash
 reboot

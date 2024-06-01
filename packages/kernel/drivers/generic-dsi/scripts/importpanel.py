@@ -9,11 +9,14 @@ import math
 
 parser = argparse.ArgumentParser(description="Extract MIPI panel description from stock dtb to use with panel-mipi-generic driver")
 parser.add_argument("-n", "--name", help="human readable panel name")
+parser.add_argument("-O", "--dtbo", help="store result in ready to use .dtbo file")
 parser.add_argument(metavar="/path/to/vendor.dtb", dest="source_dtb", help="dtb file from stock firmware")
 args = parser.parse_args()
 
 with open(args.source_dtb, "rb") as f:
     dtb_data = f.read()
+
+acc = []
 
 g_name = f"name='{args.name}' " if args.name else ""
 
@@ -38,7 +41,7 @@ flags = panel.get_property("dsi,flags").value
 flags |= 0x0400
 
 # G size=52,70 delays=2,1,20,120,50,20 format=rgb888 lanes=4 flags=0xe03
-print(f"G {g_name}size={w},{h} delays={delays_str} format={fmt} lanes={lanes} flags=0x{flags:x}\n")
+acc += [f"G {g_name}size={w},{h} delays={delays_str} format={fmt} lanes={lanes} flags=0x{flags:x}", ""]
 
 
 timings = panel.get_subnode("display-timings")
@@ -116,7 +119,7 @@ for targetfps in [50/1.001, 50, 50.0070, 57.5, 59.7275, 60/1.001, def_fps, 60.09
     # TODO: maybe iterate over some clock values too
     options = [(absfrac(clock*1000/targetfps/vt), vt) for vt in range(vtotal, min(vtotal+50, maxvtotal+1))]
     if options == []:
-        print(f"# failed to find mode for fps={targetfps:.6f} c={clock} h={htotal} v={vtotal}")
+        acc += [f"# failed to find mode for fps={targetfps:.6f} c={clock} h={htotal} v={vtotal}"]
         continue
     (mindev, newvtotal) = min(options)
     # construct a new mode with chosen vtotal
@@ -129,9 +132,9 @@ for targetfps in [50/1.001, 50, 50.0070, 57.5, 59.7275, 60/1.001, def_fps, 60.09
     hor_str = ','.join(map(str, hor))
     ver_str = ','.join(map(str, ver))
     maybe_default = " default=1" if targetfps == def_fps else ""
-    print(f"M clock={clock} horizontal={hor_str} vertical={ver_str}{maybe_default} # {warn}fps={expectedfps:.6f} (target={targetfps:.6f})")
+    acc += [f"M clock={clock} horizontal={hor_str} vertical={ver_str}{maybe_default} # {warn}fps={expectedfps:.6f} (target={targetfps:.6f})"]
 
-print()
+acc += [""]
 
 iseq0 = panel.get_property("panel-init-sequence")
 if (hasattr(iseq0, 'value')) and (isinstance(iseq0.value, (int))):
@@ -149,4 +152,19 @@ while iseq:
     iseq = iseq[datalen:]
 
     maybe_wait = f" wait={wait}" if (wait) else ""
-    print(f"I seq={data.hex()}{maybe_wait} # orig_cmd=0x{cmd:x}")
+    acc += [f"I seq={data.hex()}{maybe_wait} # orig_cmd=0x{cmd:x}"]
+
+if args.dtbo:
+    # remove empty lines as pyfdt does not like them
+    acc = [ l for l in acc if l != '']
+    # create an overlay tree
+    overlay = fdt.FDT()
+    overlay.set_property('target-path', '/dsi@ff450000/panel@0', path='fragment@0')
+    overlay.set_property('compatible', 'rocknix,generic-dsi', path='fragment@0/__overlay__')
+    overlay.set_property('panel_description', acc, path='fragment@0/__overlay__')
+    # store the overlay
+    with open(args.dtbo, "wb") as f:
+        f.write(overlay.to_dtb(version=17))
+else:
+    for l in acc:
+        print(l)
