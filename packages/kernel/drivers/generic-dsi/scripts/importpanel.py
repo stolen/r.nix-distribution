@@ -91,7 +91,7 @@ def absfrac(x):
 # 59.7275       -- https://en.wikipedia.org/wiki/Game_Boy
 # 75.47         -- https://ws.nesdev.org/wiki/Display
 def_fps = 60
-for targetfps in [50/1.001, 50, 50.0070, 57.5, 59.7275, 60/1.001, def_fps, 60.0988, 75.47, 90, 120]:
+for targetfps in [50/1.001, 50, 50.0070, 57.5, 59.7275, 60/1.001, 60, 60.0988, 75.47, 90, 120]:
     warn = ""
     # nearest fps to base on
     greaterfps = [fps for fps in modes.keys() if fps >= targetfps]
@@ -109,30 +109,37 @@ for targetfps in [50/1.001, 50, 50.0070, 57.5, 59.7275, 60/1.001, def_fps, 60.09
     # Assume original totals are minimal for the panel at this clock
     htotal = sum(hor)
     vtotal = sum(ver)
+    perfectclock = targetfps*htotal*vtotal/1000
     if not clock:
         warn = "(CAN FAIL) "
-        # This may fail, but worth trying. Round up to whole MHz
-        idealclock = targetfps*htotal*vtotal/1000
-        clock = math.ceil(idealclock/1000)*1000
-    maxvtotal = math.floor(clock*1000/targetfps/htotal)
+        # This may fail, but worth trying. Round up to 10kHz
+        clock = math.ceil(perfectclock/10)*10
+    elif clock > 1.25*perfectclock:
+        # Too much deviation may cause no image
+        clock = math.ceil(perfectclock/10)*10
+
+    maxvtotal = round(vtotal*1.25)
     # A little bruteforce to find a best totals for target fps
     # TODO: maybe iterate over some clock values too
-    options = [(absfrac(clock*1000/targetfps/vt), vt) for vt in range(vtotal, min(vtotal+50, maxvtotal+1))]
+    options = [(absfrac(c*1000/targetfps/vt), c, vt)
+            for vt in range(vtotal, maxvtotal+1)
+            for c in range(clock, round(1.25*perfectclock), 10)
+            if ((c*1000/targetfps/vt) >= htotal) and ((c*1000/targetfps/vt) < htotal*1.05) ]
     if options == []:
         acc += [f"# failed to find mode for fps={targetfps:.6f} c={clock} h={htotal} v={vtotal}"]
         continue
-    (mindev, newvtotal) = min(options)
+    (mindev, newclock, newvtotal) = min(options)
     # construct a new mode with chosen vtotal
-    newhtotal = round(clock*1000/targetfps/newvtotal)
+    newhtotal = round(newclock*1000/targetfps/newvtotal)
     addhtotal = newhtotal - htotal
     addvtotal = newvtotal - vtotal
-    expectedfps = clock*1000/newvtotal/newhtotal
+    expectedfps = newclock*1000/newvtotal/newhtotal
     hor[2] += addhtotal
     ver[2] += addvtotal
     hor_str = ','.join(map(str, hor))
     ver_str = ','.join(map(str, ver))
     maybe_default = " default=1" if targetfps == def_fps else ""
-    acc += [f"M clock={clock} horizontal={hor_str} vertical={ver_str}{maybe_default} # {warn}fps={expectedfps:.6f} (target={targetfps:.6f})"]
+    acc += [f"M clock={newclock} horizontal={hor_str} vertical={ver_str}{maybe_default} # {warn}fps={expectedfps:.6f} (target={targetfps:.6f})"]
 
 acc += [""]
 
