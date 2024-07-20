@@ -10,6 +10,7 @@ PKG_URL="https://github.com/stolen/rockchip-wlroots/archive/refs/tags/${PKG_VERS
 PKG_DEPENDS_TARGET="toolchain libinput libxkbcommon pixman libdrm wayland wayland-protocols seatd xwayland hwdata libxcb xcb-util-wm"
 PKG_LONGDESC="A modular Wayland compositor library"
 PKG_TOOLCHAIN="meson"
+PKG_PATCH_DIRS+="${DEVICE}"
 
 configure_package() {
   # OpenGLES Support
