@@ -1,0 +1,77 @@
+diff -ur mali-bifrost-r51p0-00eac0/product/kernel/drivers/gpu/arm/midgard/csf/mali_kbase_csf_firmware_log.c patched-mali-bifrost/product/kernel/drivers/gpu/arm/midgard/csf/mali_kbase_csf_firmware_log.c
+--- mali-bifrost-r51p0-00eac0/product/kernel/drivers/gpu/arm/midgard/csf/mali_kbase_csf_firmware_log.c	2024-08-14 00:26:26.000000000 +0000
++++ patched-mali-bifrost/product/kernel/drivers/gpu/arm/midgard/csf/mali_kbase_csf_firmware_log.c	2024-12-15 13:37:25.429077264 +0000
+@@ -220,7 +220,7 @@
+ 	.owner = THIS_MODULE,
+ 	.open = kbasep_csf_firmware_log_debugfs_open,
+ 	.read = kbasep_csf_firmware_log_debugfs_read,
+-	.llseek = no_llseek,
++	.llseek = NULL,
+ };
+ 
+ DEFINE_DEBUGFS_ATTRIBUTE(kbase_csf_firmware_log_mode_fops, kbase_csf_firmware_log_mode_read,
+diff -ur mali-bifrost-r51p0-00eac0/product/kernel/drivers/gpu/arm/midgard/device/mali_kbase_device.c patched-mali-bifrost/product/kernel/drivers/gpu/arm/midgard/device/mali_kbase_device.c
+--- mali-bifrost-r51p0-00eac0/product/kernel/drivers/gpu/arm/midgard/device/mali_kbase_device.c	2024-08-14 00:26:26.000000000 +0000
++++ patched-mali-bifrost/product/kernel/drivers/gpu/arm/midgard/device/mali_kbase_device.c	2024-12-15 13:38:53.227648153 +0000
+@@ -308,9 +308,13 @@
+ 
+ 	/* There is no limit for Mali, so set to max. */
+ 	if (kbdev->dev->dma_parms)
++#if (KERNEL_VERSION(6, 12, 0) > LINUX_VERSION_CODE)
+ 		err = dma_set_max_seg_size(kbdev->dev, UINT_MAX);
+ 	if (err)
+ 		goto dma_set_mask_failed;
++#else
++		dma_set_max_seg_size(kbdev->dev, UINT_MAX);
++#endif
+ 
+ 	kbdev->nr_hw_address_spaces = (s8)kbdev->gpu_props.num_address_spaces;
+ 
+diff -ur mali-bifrost-r51p0-00eac0/product/kernel/drivers/gpu/arm/midgard/mali_kbase_core_linux.c patched-mali-bifrost/product/kernel/drivers/gpu/arm/midgard/mali_kbase_core_linux.c
+--- mali-bifrost-r51p0-00eac0/product/kernel/drivers/gpu/arm/midgard/mali_kbase_core_linux.c	2024-12-15 13:40:27.548034513 +0000
++++ patched-mali-bifrost/product/kernel/drivers/gpu/arm/midgard/mali_kbase_core_linux.c	2024-12-15 13:33:12.655043353 +0000
+@@ -726,7 +726,9 @@
+ 	}
+ 
+ 	filp->private_data = kfile;
++#if (KERNEL_VERSION(6, 12, 0) > LINUX_VERSION_CODE)
+ 	filp->f_mode |= FMODE_UNSIGNED_OFFSET;
++#endif
+ 
+ 	return 0;
+ 
+diff -ur mali-bifrost-r51p0-00eac0/product/kernel/drivers/gpu/arm/midgard/mali_kbase_kinstr_jm.c patched-mali-bifrost/product/kernel/drivers/gpu/arm/midgard/mali_kbase_kinstr_jm.c
+--- mali-bifrost-r51p0-00eac0/product/kernel/drivers/gpu/arm/midgard/mali_kbase_kinstr_jm.c	2024-08-14 00:26:26.000000000 +0000
++++ patched-mali-bifrost/product/kernel/drivers/gpu/arm/midgard/mali_kbase_kinstr_jm.c	2024-12-15 13:37:40.129670830 +0000
+@@ -651,7 +651,7 @@
+ 
+ /* The file operations virtual function table */
+ static const struct file_operations file_operations = { .owner = THIS_MODULE,
+-							.llseek = no_llseek,
++							.llseek = NULL,
+ 							.read = reader_read,
+ 							.poll = reader_poll,
+ 							.release = reader_release };
+diff -ur mali-bifrost-r51p0-00eac0/product/kernel/drivers/gpu/arm/midgard/mali_malisw.h patched-mali-bifrost/product/kernel/drivers/gpu/arm/midgard/mali_malisw.h
+--- mali-bifrost-r51p0-00eac0/product/kernel/drivers/gpu/arm/midgard/mali_malisw.h	2024-08-14 00:26:26.000000000 +0000
++++ patched-mali-bifrost/product/kernel/drivers/gpu/arm/midgard/mali_malisw.h	2024-12-15 13:31:34.130743890 +0000
+@@ -26,6 +26,10 @@
+ #ifndef _MALISW_H_
+ #define _MALISW_H_
+ 
++#include <linux/version.h>
++
++#if (KERNEL_VERSION(6, 12, 0) > LINUX_VERSION_CODE)
++
+ /**
+  * MIN - Return the lesser of two values.
+  * @x: value1
+@@ -50,6 +52,8 @@
+  */
+ #define MAX(x, y) ((x) < (y) ? (y) : (x))
+ 
++#endif // 6.12.0 > LINUX_VERSION_CODE
++
+ /**
+  * CSTD_UNUSED - Function-like macro for suppressing unused variable warnings.
+  *
