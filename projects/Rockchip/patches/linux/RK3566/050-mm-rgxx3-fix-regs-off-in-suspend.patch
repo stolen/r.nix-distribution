@@ -46,7 +46,7 @@ index 1c2008efc5b8..494f4d38477a 100644
  	};
  
  	vibrator: pwm-vibrator {
-@@ -289,13 +291,12 @@ vdd_logic: DCDC_REG1 {
+@@ -289,7 +291,7 @@ vdd_logic: DCDC_REG1 {
  				regulator-initial-mode = <0x2>;
  				regulator-name = "vdd_logic";
  				regulator-state-mem {
@@ -55,12 +55,6 @@ index 1c2008efc5b8..494f4d38477a 100644
  					regulator-suspend-microvolt = <900000>;
  				};
  			};
- 
- 			vdd_gpu: DCDC_REG2 {
--				regulator-always-on;
- 				regulator-boot-on;
- 				regulator-min-microvolt = <500000>;
- 				regulator-max-microvolt = <1350000>;
 @@ -342,15 +343,8 @@ regulator-state-mem {
  				};
  			};
