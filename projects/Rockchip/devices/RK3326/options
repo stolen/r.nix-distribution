@@ -29,6 +29,10 @@
     BOOTLOADER="u-boot"
     PARTITION_TABLE="msdos"
 
+  # Kernel extra options (temporarily here until all Rockchip migrates to 1500000)
+    #EXTRA_CMDLINE="${EXTRA_CMDLINE/115200/1500000}"
+    EXTRA_CMDLINE="quiet console=ttyS2,1500000 console=tty0 systemd.debug_shell=ttyS2"
+
   # Define the CPU
     HW_CPU="Rockchip RK3326"
 

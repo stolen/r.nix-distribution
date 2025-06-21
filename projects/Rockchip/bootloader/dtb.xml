@@ -12,7 +12,7 @@
       <file>rk3326-powkiddy-rgb10</file>
       <file>rk3326-powkiddy-rgb20s</file>
     </a>
-    <b bootmethod="bootini">
+    <b bootmethod="bootscr">
       <file>rk3326-powkiddy-rgb10x</file>
       <file>rk3326-magicx-xu10</file>
       <file>rk3326-magicx-xu-mini-m</file>

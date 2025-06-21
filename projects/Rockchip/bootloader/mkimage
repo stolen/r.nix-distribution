@@ -8,6 +8,9 @@ mkimage_uboot() {
   elif [ -f "${RELEASE_DIR}/3rdparty/bootloader/uboot.bin" ]; then
     echo "image: writing uboot.bin to $(basename ${DISK})..."
     dd if="${RELEASE_DIR}/3rdparty/bootloader/uboot.bin" of="${DISK}" bs=512 seek=64 conv=sync,noerror,notrunc >"${SAVE_ERROR}" 2>&1 || show_error
+  else
+    echo "Cannot find ${RELEASE_DIR}/3rdparty/bootloader/${SUBDEVICE}_uboot.bin"
+    exit 2
   fi
 }
 
@@ -18,6 +21,21 @@ mkimage_bootini() {
   elif [ -f "${RELEASE_DIR}/3rdparty/bootloader/boot.ini" ]; then
     echo "image: copying boot.ini..."
     mcopy "${RELEASE_DIR}/3rdparty/bootloader/boot.ini" ::
+  fi
+}
+
+mkimage_bootscr() {
+  if [ -f "${RELEASE_DIR}/3rdparty/bootloader/${SUBDEVICE}_boot.scr" ]; then
+    echo "image: copying ${SUBDEVICE}_boot.ini..."
+    mcopy "${RELEASE_DIR}/3rdparty/bootloader/${SUBDEVICE}_boot.scr" ::/boot.scr
+  else
+    echo "cannot find ${RELEASE_DIR}/3rdparty/bootloader/${SUBDEVICE}_boot.scr"
+    exit 2
+  fi
+
+  if [ -d "${RELEASE_DIR}/3rdparty/bootloader/${SUBDEVICE}_extlinux" ]; then
+    echo "image: copying ${SUBDEVICE}_extlinux..."
+    mcopy -s -o "${RELEASE_DIR}/3rdparty/bootloader/${SUBDEVICE}_extlinux" ::/extlinux
   fi
 }
 

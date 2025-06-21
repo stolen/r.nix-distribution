@@ -18,12 +18,21 @@ fi
 mount -o remount,rw $BOOT_ROOT
 
 DT_SOC=$($SYSTEM_ROOT/usr/bin/dtsoc | cut -f2 -d,)
-DT_ID=$($SYSTEM_ROOT/usr/bin/dtname)
-if [ -n "$DT_ID" ]; then
-  case $DT_ID in
-    powkiddy,x55) SUBDEVICE="Powkiddy_x55";;
-    *) SUBDEVICE="Generic";;
-  esac
+if [ "$DT_SOC" = "rk3326" ]; then
+  # keep legacy u-boot on old installations, even if it initially was a "b" image
+  if grep -q "odroidgoa-uboot-config" $BOOT_ROOT/boot.ini 2>/dev/null; then
+    SUBDEVICE="a"
+  else
+    SUBDEVICE="b"
+  fi
+else
+  DT_ID=$($SYSTEM_ROOT/usr/bin/dtname)
+  if [ -n "$DT_ID" ]; then
+    case $DT_ID in
+      powkiddy,x55) SUBDEVICE="Powkiddy_x55";;
+      *) SUBDEVICE="Generic";;
+    esac
+  fi
 fi
 
 ### Migrate device trees to subfolder (except RK326) - remove in the future
@@ -71,6 +80,11 @@ for BOOT_IMAGE in ${SUBDEVICE}_uboot.bin uboot.bin; do
     break
   fi
 done
+
+# boot.scr is not user serviceable and contains device detection logic. Update it if possible
+if [ -f "$SYSTEM_ROOT/usr/share/bootloader/${SUBDEVICE}_boot.scr" ]; then
+  cp -f "$SYSTEM_ROOT/usr/share/bootloader/${SUBDEVICE}_boot.scr" $BOOT_ROOT/
+fi
 
 # mount $BOOT_ROOT ro
 sync
