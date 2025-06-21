@@ -6,7 +6,15 @@ PKG_VERSION="0.1.0"
 PKG_LICENSE="GPL"
 PKG_LONGDESC="generic DSI panel driver"
 PKG_DEPENDS_TARGET="pyFDT"
+PKG_URL="https://github.com/stolen/overlay_server/archive/refs/heads/main.zip"
 PKG_TOOLCHAIN="manual"
+
+unpack() {
+  echo $PWD
+  mkdir -p "${PKG_BUILD}"
+  cd "${PKG_BUILD}"
+  unzip "${SOURCES}/${PKG_NAME}/${PKG_SOURCE_NAME}"
+}
 
 ### For development. Easier to check if code compiles and works.
 ### No need for a long build-transfer-reboot-wait-reboot-check loop
@@ -21,6 +29,9 @@ make_target() {
 
 makeinstall_target() {
   mkdir -p "${INSTALL}/usr/libexec/generic-dsi"
+  # rocknix_dtbo.py is a better script handling not just panel, but also joypad, headphones, etc.
+  cp -v "${PKG_BUILD}/"overlay_server*"/rocknix_dtbo.py" "${INSTALL}/usr/libexec/generic-dsi/"
+  # importpanel.py still here because it's simple, documented in wiki and performs just one task well
   cp -v "${PKG_DIR}/scripts/importpanel.py" "${INSTALL}/usr/libexec/generic-dsi/"
 }
 
