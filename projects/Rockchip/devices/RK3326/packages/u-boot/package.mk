@@ -14,7 +14,7 @@ PKG_NEED_UNPACK="${PROJECT_DIR}/${PROJECT}/bootloader ${PROJECT_DIR}/${PROJECT}/
 PKG_NEED_UNPACK+=" ${PROJECT_DIR}/${PROJECT}/options ${PROJECT_DIR}/${PROJECT}/devices/${DEVICE}/options"
 
 # B image uses mainline
-PKG_DEPENDS_TARGET+="u-boot-mainline"
+PKG_DEPENDS_TARGET+=" u-boot-mainline"
 PKG_NEED_UNPACK+=" $(get_pkg_directory u-boot-mainline)"
 
 if [ -n "${UBOOT_FIRMWARE}" ]; then
