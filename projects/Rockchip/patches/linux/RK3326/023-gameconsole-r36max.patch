@@ -1,7 +1,7 @@
 new file mode 100644
 --- /dev/null
 +++ b/arch/arm64/boot/dts/rockchip/rk3326-gameconsole-r36max.dts
-@@ -0,0 +1,900 @@
+@@ -0,0 +1,903 @@
 +/// SPDX-License-Identifier: (GPL-2.0+ OR MIT)
 +/*
 + * Copyright (c) 2024-present ROCKNIX (https://github.com/ROCKNIX)
@@ -93,8 +93,8 @@ new file mode 100644
 +        keyup-threshold-microvolt = <1800000>;
 +        poll-interval = <100>;
 +
-+	/* disabled by default, dtbo may enable it when needed */
-+	status = "disabled";
++        /* disabled by default, dtbo may enable it when needed */
++        status = "disabled";
 +
 +        button-vol-up {
 +            press-threshold-microvolt = <15000>;
@@ -287,7 +287,7 @@ new file mode 100644
 +        led-1 {
 +                color = <LED_COLOR_ID_BLUE>;
 +                default-state = "on";
-+                function = LED_FUNCTION_STATUS;
++                function = LED_FUNCTION_POWER;
 +                linux,default-trigger = "default-on";
 +                gpios = <&gpio0 RK_PA0 GPIO_ACTIVE_HIGH>;
 +        };
@@ -333,6 +333,7 @@ new file mode 100644
 +		compatible = "regulator-fixed";
 +		regulator-name = "vcc5v0_sys";
 +		regulator-always-on;
++		regulator-boot-on;
 +		regulator-min-microvolt = <5000000>;
 +		regulator-max-microvolt = <5000000>;
 +	};
@@ -598,12 +599,14 @@ new file mode 100644
 +
 +        vcc2v8_dvp: LDO_REG7 {
 +              regulator-name = "vcc2v8_dvp";
-+              regulator-min-microvolt = <2800000>;
-+              regulator-max-microvolt = <2800000>;
++              regulator-min-microvolt = <1800000>;
++              regulator-max-microvolt = <3300000>;
++              regulator-always-on;
++              regulator-boot-on;
 +
 +              regulator-state-mem {
 +              regulator-off-in-suspend;
-+                  regulator-suspend-microvolt = <2800000>;
++                  regulator-suspend-microvolt = <3300000>;
 +              };
 +        };
 +
